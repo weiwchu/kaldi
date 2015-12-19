@@ -2,6 +2,8 @@
 
 CXX = g++
 # CXX = clang++  # Uncomment this line to build with Clang.
+CFLAGS="-O2"
+CXXFLAGS="-O2"
 
 OPENFST_VERSION = 1.3.4
 # Uncomment the next line to build with OpenFst-1.4.1.
@@ -25,7 +27,8 @@ else
   endif
 endif
 
-all: check_required_programs sph2pipe atlas sclite openfst
+# all: check_required_programs sph2pipe atlas sclite openfst
+all: check_required_programs sph2pipe sclite openfst
 	@echo -e "\n\n"
 	@echo "Warning: IRSTLM is not installed by default anymore. If you need IRSTLM"
 	@echo "Warning: use the script extras/install_irstlm.sh"
@@ -149,7 +152,8 @@ openblas: openblas_compiled
 
 .PHONY: openblas_compiled
 
-fortran_opt = $(shell gcc -v 2>&1 | perl -e '$$x = join(" ", <STDIN>); if($$x =~ m/target=\S+64\S+/) { print "BINARY=64"; }')
+# fortran_opt = $(shell gcc -v 2>&1 | perl -e '$$x = join(" ", <STDIN>); if($$x =~ m/target=\S+64\S+/) { print "BINARY=64"; }')
+fortran_opt = "BINARY=64"
 
 
 # note: you can uncomment the line that has USE_THREAD=1 and comment the line
@@ -166,8 +170,8 @@ openblas_compiled:
 	echo "Note: see tools/Makefile for options regarding OpenBLAS compilation"
 	-git clone https://github.com/xianyi/OpenBLAS.git
 	-cd OpenBLAS; git pull
-	cd OpenBLAS; sed 's:# FCOMMON_OPT = -frecursive:FCOMMON_OPT = -frecursive:' < Makefile.rule >tmp && mv tmp Makefile.rule
-	# $(MAKE) PREFIX=`pwd`/OpenBLAS/install FC=gfortran $(fortran_opt) DEBUG=1 USE_THREAD=1 NUM_THREADS=64 -C OpenBLAS all install
-	$(MAKE) PREFIX=`pwd`/OpenBLAS/install FC=gfortran $(fortran_opt) DEBUG=1 USE_THREAD=0 -C OpenBLAS all install
+	cd OpenBLAS; sed 's:# FCOMMON_OPT = -frecursive:FCOMMON_OPT = -frecursive -O2:' < Makefile.rule >tmp && mv tmp Makefile.rule
+	$(MAKE) PREFIX=`pwd`/OpenBLAS/install FC=gfortran $(fortran_opt) USE_THREAD=1 NUM_THREADS=64 -C OpenBLAS all install
+	# $(MAKE) PREFIX=`pwd`/OpenBLAS/install FC=gfortran $(fortran_opt) DEBUG=1 USE_THREAD=0 -C OpenBLAS all install
 
 
